@@ -6,7 +6,7 @@ const DATA_FILE: &str = "tasks.json";
 fn main() {
     let matches = Command::new("Task Manager")
         .version("1.0")
-        .author("Your Name <your.email@example.com>")
+        .author("g4titan, g4titan1@gmail.com")
         .about("Manages tasks")
         .subcommand(
             Command::new("add")
@@ -17,7 +17,7 @@ fn main() {
                 .arg(Arg::new("task")
                     .help("Task details")
                     .required(true)
-                    .num_args(1..)) // allows one or more arguments
+                    .num_args(1..))
         )
         .subcommand(Command::new("list").about("Lists all tasks"))
         .subcommand(

@@ -42,7 +42,7 @@ impl TaskManager {
                 let tasks: HashMap<String, Vec<String>> = serde_json::from_str(&content)?;
                 Ok(TaskManager { tasks })
             }
-            Err(_) => Ok(TaskManager::new()), // If file does not exist, return a new TaskManager
+            Err(_) => Ok(TaskManager::new()), 
         }
     }
 }
