@@ -1,5 +1,9 @@
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
+use serde::{Deserialize, Serialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct TaskManager {
     tasks: HashMap<String, Vec<String>>,
 }
@@ -21,6 +25,25 @@ impl TaskManager {
 
     pub fn get_task(&self, name: &str) -> Option<&Vec<String>> {
         self.tasks.get(name)
+    }
+    
+    pub fn save_to_file(&self, filename: &str) -> std::io::Result<()> {
+        let file = File::create(filename)?;
+        serde_json::to_writer(file, &self.tasks)?;
+        Ok(())
+    }
+
+    pub fn load_from_file(filename: &str) -> std::io::Result<TaskManager> {
+        let file = File::open(filename);
+        match file {
+            Ok(mut file) => {
+                let mut content = String::new();
+                file.read_to_string(&mut content)?;
+                let tasks: HashMap<String, Vec<String>> = serde_json::from_str(&content)?;
+                Ok(TaskManager { tasks })
+            }
+            Err(_) => Ok(TaskManager::new()), // If file does not exist, return a new TaskManager
+        }
     }
 }
 
