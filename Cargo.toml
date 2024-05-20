@@ -1,5 +1,5 @@
 [package]
-name = "task_scheduler_cli"
+name = "task_manager_cli"
 version = "0.1.0"
 edition = "2021"
 

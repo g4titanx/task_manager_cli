@@ -1,5 +1,5 @@
 use clap::{Arg, Command};
-use task_scheduler_cli::TaskManager;
+use task_manager_cli::TaskManager;
 
 const DATA_FILE: &str = "tasks.json";
 
