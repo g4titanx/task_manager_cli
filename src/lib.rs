@@ -1,17 +1,17 @@
-use std::collections::HashMap;
+use indexmap::IndexMap;
+use serde::{Serialize, Deserialize};
 use std::fs::File;
-use std::io::Read;
-use serde::{Deserialize, Serialize};
+use std::io::{self, Read, Write};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TaskManager {
-    tasks: HashMap<String, Vec<String>>,
+    tasks: IndexMap<String, Vec<String>>, // Use IndexMap here
 }
 
 impl TaskManager {
-    pub fn new() -> TaskManager {
+    pub fn new() -> Self {
         TaskManager {
-            tasks: HashMap::new(),
+            tasks: IndexMap::new(),
         }
     }
 
@@ -19,33 +19,37 @@ impl TaskManager {
         self.tasks.insert(name, details);
     }
 
-    pub fn list_tasks(&self) -> &HashMap<String, Vec<String>> {
+    pub fn list_tasks(&self) -> &IndexMap<String, Vec<String>> {
         &self.tasks
     }
 
     pub fn get_task(&self, name: &str) -> Option<&Vec<String>> {
         self.tasks.get(name)
     }
-    
-    pub fn save_to_file(&self, filename: &str) -> std::io::Result<()> {
+
+    pub fn save_to_file(&self, filename: &str) -> io::Result<()> {
         let file = File::create(filename)?;
         serde_json::to_writer(file, &self.tasks)?;
         Ok(())
     }
 
-    pub fn load_from_file(filename: &str) -> std::io::Result<TaskManager> {
+    pub fn load_from_file(filename: &str) -> io::Result<TaskManager> {
         let file = File::open(filename);
         match file {
             Ok(mut file) => {
                 let mut content = String::new();
                 file.read_to_string(&mut content)?;
-                let tasks: HashMap<String, Vec<String>> = serde_json::from_str(&content)?;
+                if content.is_empty() {
+                    return Ok(TaskManager::new());
+                }
+                let tasks: IndexMap<String, Vec<String>> = serde_json::from_str(&content)?;
                 Ok(TaskManager { tasks })
             }
-            Err(_) => Ok(TaskManager::new()), 
+            Err(_) => Ok(TaskManager::new()), // If file does not exist, return a new TaskManager
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {
