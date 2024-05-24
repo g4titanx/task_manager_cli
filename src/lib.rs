@@ -1,11 +1,11 @@
 use indexmap::IndexMap;
 use serde::{Serialize, Deserialize};
 use std::fs::File;
-use std::io::{self, Read, Write};
+use std::io::{self, Read};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TaskManager {
-    tasks: IndexMap<String, Vec<String>>, // Use IndexMap here
+    tasks: IndexMap<String, Vec<String>>,
 }
 
 impl TaskManager {
@@ -45,7 +45,7 @@ impl TaskManager {
                 let tasks: IndexMap<String, Vec<String>> = serde_json::from_str(&content)?;
                 Ok(TaskManager { tasks })
             }
-            Err(_) => Ok(TaskManager::new()), // If file does not exist, return a new TaskManager
+            Err(_) => Ok(TaskManager::new()),
         }
     }
 }
