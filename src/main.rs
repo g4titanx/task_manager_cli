@@ -27,6 +27,13 @@ fn main() {
                     .help("Name of the task to get")
                     .required(true))
         )
+        .subcommand(
+            Command::new("delete")
+                .about("Deletes a specific task")
+                .arg(Arg::new("name")
+                    .help("Name of the task to delete")
+                    .required(true))
+        )
         .get_matches();
 
     let mut task_manager = TaskManager::load_from_file(DATA_FILE).expect("Failed to load tasks");
@@ -60,6 +67,14 @@ fn main() {
                 }
             },
             None => println!("No task found with name '{}'", name),
+        }
+    } else if let Some(matches) = matches.subcommand_matches("delete") {
+        let name = matches.get_one::<String>("name").unwrap();
+        if task_manager.delete_task(name) {
+            task_manager.save_to_file(DATA_FILE).expect("Failed to save tasks");
+            println!("Task '{}' deleted successfully.", name);
+        } else {
+            println!("No task found with name '{}'", name);
         }
     }
 }

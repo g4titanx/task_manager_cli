@@ -27,6 +27,10 @@ impl TaskManager {
         self.tasks.get(name)
     }
 
+    pub fn delete_task(&mut self, name: &str) -> bool {
+        self.tasks.swap_remove(name).is_some()
+    }
+
     pub fn save_to_file(&self, filename: &str) -> io::Result<()> {
         let file = File::create(filename)?;
         serde_json::to_writer(file, &self.tasks)?;
