@@ -1,5 +1,5 @@
 use indexmap::IndexMap;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{self, Read};
 
@@ -54,7 +54,6 @@ impl TaskManager {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -62,8 +61,14 @@ mod tests {
     #[test]
     fn test_add_and_get_task() {
         let mut manager = TaskManager::new();
-        manager.add_task("TestTask".to_string(), vec!["Detail1".to_string(), "Detail2".to_string()]);
-        assert_eq!(manager.get_task("TestTask"), Some(&vec!["Detail1".to_string(), "Detail2".to_string()]));
+        manager.add_task(
+            "TestTask".to_string(),
+            vec!["Detail1".to_string(), "Detail2".to_string()],
+        );
+        assert_eq!(
+            manager.get_task("TestTask"),
+            Some(&vec!["Detail1".to_string(), "Detail2".to_string()])
+        );
     }
 
     #[test]

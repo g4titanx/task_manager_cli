@@ -11,28 +11,28 @@ fn main() {
         .subcommand(
             Command::new("add")
                 .about("Adds a new task")
-                .arg(Arg::new("name")
-                    .help("Name of the task")
-                    .required(true))
-                .arg(Arg::new("task")
-                    .help("Task details")
-                    .required(true)
-                    .num_args(1..))
+                .arg(Arg::new("name").help("Name of the task").required(true))
+                .arg(
+                    Arg::new("task")
+                        .help("Task details")
+                        .required(true)
+                        .num_args(1..),
+                ),
         )
         .subcommand(Command::new("list").about("Lists all tasks"))
         .subcommand(
-            Command::new("get")
-                .about("Gets a specific task")
-                .arg(Arg::new("name")
+            Command::new("get").about("Gets a specific task").arg(
+                Arg::new("name")
                     .help("Name of the task to get")
-                    .required(true))
+                    .required(true),
+            ),
         )
         .subcommand(
-            Command::new("delete")
-                .about("Deletes a specific task")
-                .arg(Arg::new("name")
+            Command::new("delete").about("Deletes a specific task").arg(
+                Arg::new("name")
                     .help("Name of the task to delete")
-                    .required(true))
+                    .required(true),
+            ),
         )
         .get_matches();
 
@@ -40,12 +40,15 @@ fn main() {
 
     if let Some(matches) = matches.subcommand_matches("add") {
         let name = matches.get_one::<String>("name").unwrap();
-        let task_details: Vec<String> = matches.get_many::<String>("task")
+        let task_details: Vec<String> = matches
+            .get_many::<String>("task")
             .unwrap_or_default()
             .map(|s| s.to_string())
             .collect();
         task_manager.add_task(name.to_string(), task_details);
-        task_manager.save_to_file(DATA_FILE).expect("Failed to save tasks");
+        task_manager
+            .save_to_file(DATA_FILE)
+            .expect("Failed to save tasks");
         println!("Task '{}' added successfully.", name);
     } else if let Some(_) = matches.subcommand_matches("list") {
         let mut tasks: Vec<_> = task_manager.list_tasks().iter().collect();
@@ -65,13 +68,15 @@ fn main() {
                 for detail in task {
                     println!("    - {}", detail);
                 }
-            },
+            }
             None => println!("No task found with name '{}'", name),
         }
     } else if let Some(matches) = matches.subcommand_matches("delete") {
         let name = matches.get_one::<String>("name").unwrap();
         if task_manager.delete_task(name) {
-            task_manager.save_to_file(DATA_FILE).expect("Failed to save tasks");
+            task_manager
+                .save_to_file(DATA_FILE)
+                .expect("Failed to save tasks");
             println!("Task '{}' deleted successfully.", name);
         } else {
             println!("No task found with name '{}'", name);
