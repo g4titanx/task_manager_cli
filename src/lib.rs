@@ -3,41 +3,58 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{self, Read};
 
+/// Represents a task manager that loads tasks from a JSON file.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TaskManager {
     tasks: IndexMap<String, Vec<String>>,
 }
 
 impl TaskManager {
+    /// Creates a new `TaskManager`.
     pub fn new() -> Self {
         TaskManager {
             tasks: IndexMap::new(),
         }
     }
 
+    /// Adds a new task with details.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the task.
+    /// * `details` - A vector of details about the task.
     pub fn add_task(&mut self, name: String, details: Vec<String>) {
         self.tasks.insert(name, details);
     }
 
+    /// Lists all tasks.
     pub fn list_tasks(&self) -> &IndexMap<String, Vec<String>> {
         &self.tasks
     }
 
+    /// Gets a specific task by name.
+    ///
+    /// Returns `None` if the task does not exist.
     pub fn get_task(&self, name: &str) -> Option<&Vec<String>> {
         self.tasks.get(name)
     }
 
-    pub fn delete_task(&mut self, name: &str) -> bool {
-        self.tasks.swap_remove(name).is_some()
+    /// Deletes a specific task by name.
+    ///
+    /// Returns `true` if the task was found and deleted, otherwise `false`.
+    pub fn delete_task(&self, name: &str) -> bool {
+        self.tasks.remove(name).is_some()
     }
 
+    /// Saves the task manager to a JSON file.
     pub fn save_to_file(&self, filename: &str) -> io::Result<()> {
         let file = File::create(filename)?;
         serde_json::to_writer(file, &self.tasks)?;
         Ok(())
     }
 
-    pub fn load_from_file(filename: &str) -> io::Result<TaskManager> {
+    /// Loads the task manager from a JSON file.
+    pub fn load_from_file(filename: &str) -> io::Result<Self> {
         let file = File::open(filename);
         match file {
             Ok(mut file) => {
@@ -57,6 +74,7 @@ impl TaskManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use indexmap::IndexMap;
 
     #[test]
     fn test_add_and_get_task() {
