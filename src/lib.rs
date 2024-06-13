@@ -42,8 +42,8 @@ impl TaskManager {
     /// Deletes a specific task by name.
     ///
     /// Returns `true` if the task was found and deleted, otherwise `false`.
-    pub fn delete_task(&self, name: &str) -> bool {
-        self.tasks.remove(name).is_some()
+    pub fn delete_task(&mut self, name: &str) -> bool {
+        self.tasks.swap_remove(name).is_some()
     }
 
     /// Saves the task manager to a JSON file.
@@ -74,7 +74,6 @@ impl TaskManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use indexmap::IndexMap;
 
     #[test]
     fn test_add_and_get_task() {
