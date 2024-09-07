@@ -32,7 +32,25 @@ fn main() {
                 Arg::new("name")
                     .help("Name of the task to delete")
                     .required(true),
-            ),
+            )
+      
+        )
+        .subcommand(
+            Command::new("update").about("updates a specific task").arg(
+                Arg::new("name")
+                    .help("Update objectives of a task")
+                    .required(true),
+            )
+            .arg(
+                    Arg::new("objective_id")
+                        .help(" index of objective you wish to update ")
+                        .required(true)
+                )
+            .arg(
+                    Arg::new("objective_value")
+                        .help("new value of objective ")
+                        .required(true)
+                ),
         )
         .get_matches();
 
@@ -80,6 +98,26 @@ fn main() {
             println!("Task '{}' deleted successfully.", name);
         } else {
             println!("No task found with name '{}'", name);
+        }
+    }
+    else if let Some(matches) = matches.subcommand_matches("update") {
+        let name = matches.get_one::<String>("name").unwrap();
+        let objective_id_str = matches.get_one::<String>("objective_id").unwrap(); 
+        let index = objective_id_str.parse::<usize>().expect("Error: objective_id must be a valid u8");
+        match task_manager.get_mut_task(name) { 
+            Some(task) => { 
+            let new_objective_value =matches.get_one::<String>("objective_value").unwrap();
+        if (index) < task.len() {
+            task[index] = new_objective_value.to_string();
+            println!("Updated Task at '{}': {:?}", index, task);
+        } else {
+            println!("Error: Index {} is out of bounds for Vec at key '{}'", index, name);
+        }
+        task_manager
+                .save_to_file(DATA_FILE)
+                .expect("Failed to save tasks");
+            }
+            None => println!("No task found with name '{}'", name),
         }
     }
 }
