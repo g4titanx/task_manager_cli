@@ -35,15 +35,21 @@ impl TaskManager {
     /// Gets a specific task by name.
     ///
     /// Returns `None` if the task does not exist.
-    pub fn get_task(&self, name: &str) -> Option<&Vec<String>> {
+    pub fn get_task(&self,  name: &str) ->  Option<&Vec<String>> {
         self.tasks.get(name)
     }
-
+    /// Gets a mutable task by name 
+    pub fn get_mut_task(&mut self,  name: &str) ->  Option<&mut Vec<String>> {
+        self.tasks.get_mut(name)
+    }
     /// Deletes a specific task by name.
     ///
     /// Returns `true` if the task was found and deleted, otherwise `false`.
     pub fn delete_task(&mut self, name: &str) -> bool {
         self.tasks.swap_remove(name).is_some()
+    }
+    pub fn update_task(&mut self, name: &str, objective:Vec<String>)  {
+        self.tasks.insert(name.to_string(),objective );
     }
 
     /// Saves the task manager to a JSON file.
