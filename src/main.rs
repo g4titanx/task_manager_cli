@@ -1,9 +1,13 @@
-use clap::{Arg, Command};
+use clap::{builder::Str, Arg, Command};
+use rustyline::{DefaultEditor, Editor};
 use task_manager_cli::TaskManager;
 
 const DATA_FILE: &str = "tasks.json";
 
 fn main() {
+
+    
+
     let matches = Command::new("Task Manager")
         .version("1.0")
         .author("g4titan, g4titan1@gmail.com")
@@ -46,11 +50,6 @@ fn main() {
                         .help(" index of objective you wish to update ")
                         .required(true)
                 )
-            .arg(
-                    Arg::new("objective_value")
-                        .help("new value of objective ")
-                        .required(true)
-                ),
         )
         .get_matches();
 
@@ -104,15 +103,31 @@ fn main() {
         let name = matches.get_one::<String>("name").unwrap();
         let objective_id_str = matches.get_one::<String>("objective_id").unwrap(); 
         let index = objective_id_str.parse::<usize>().expect("Error: objective_id must be a valid u8");
+        let mut updated_data = String::new();
         match task_manager.get_mut_task(name) { 
-            Some(task) => { 
-            let new_objective_value =matches.get_one::<String>("objective_value").unwrap();
+        Some(task) => { 
+   
         if (index) < task.len() {
-            task[index] = new_objective_value.to_string();
+        let current_value = &task[index];
+        println!("Current objective value: {}", current_value);
+        let mut rl = DefaultEditor::new().expect("Error initializing line editor");
+        let prompt = format!("Edit objective [{}]: ", current_value);
+        match rl.readline_with_initial(&prompt, (current_value, "")) {
+        Ok(edited_value) => {
+        task[index] = edited_value.to_string();
+        updated_data  = edited_value;
+
+        }
+        Err(err) => {
+                    println!("Error: {}", err);
+        }
+        }
+
             println!("Updated Task at '{}': {:?}", index, task);
         } else {
             println!("Error: Index {} is out of bounds for Vec at key '{}'", index, name);
         }
+        task_manager.update_task(index, name, updated_data);
         task_manager
                 .save_to_file(DATA_FILE)
                 .expect("Failed to save tasks");
@@ -120,6 +135,9 @@ fn main() {
             None => println!("No task found with name '{}'", name),
         }
     }
+
+
+    // if let Some(task) = task_manager.get_task(name)
 }
 
 fn capitalize_first_letter(s: &str) -> String {
