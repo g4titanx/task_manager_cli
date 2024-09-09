@@ -1,3 +1,4 @@
+use clap::builder::Str;
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
@@ -46,12 +47,18 @@ impl TaskManager {
     ///
     /// Returns `true` if the task was found and deleted, otherwise `false`.
     pub fn delete_task(&mut self, name: &str) -> bool {
-        self.tasks.swap_remove(name).is_some()
+    self.tasks.swap_remove(name).is_some()
     }
-    pub fn update_task(&mut self, name: &str, objective:Vec<String>)  {
-        self.tasks.insert(name.to_string(),objective );
+    /// Updates a specific task objective
+    pub fn update_task(&mut self, index:usize, name: &str, updated_data: String) {
+    match  self.tasks.get_mut(name){
+    Some(objective) =>{
+    objective[index] = updated_data;
+    }  
+    None=>{
+    println!("data not found for index{}", index);
     }
-
+    }}
     /// Saves the task manager to a JSON file.
     pub fn save_to_file(&self, filename: &str) -> io::Result<()> {
         let file = File::create(filename)?;
